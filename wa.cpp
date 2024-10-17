@@ -25,7 +25,7 @@ std::string  convert_to_string(const int Number) {
 */
 statWA wanalysis(const Task& ti, const std::vector<Task>& hps, const int m, const int K) {
 
-	cout << "Weakly hard real-time analysis of a task ti" << endl;
+	// cout << "Weakly hard real-time analysis of a task ti" << endl;
 	double ci = ti.get_wcet(), di = ti.get_dline(), pi = ti.get_period(), Ri = ti.get_wcrt(), bri = ti.get_bcrt();
 	double BP = ti.get_bp(); int Ni = ceil(BP / pi);
 	double ui = ci / pi;
@@ -648,6 +648,7 @@ statWA wanalysis(const Task& ti, const std::vector<Task>& hps, const int m, cons
 
 	}
 	catch (IloException& e) {
+		std::cout << "Concert exception caught: " << e << endl;
 		cerr << "Concert exception caught: " << e << endl;
 		return swa;
 	}

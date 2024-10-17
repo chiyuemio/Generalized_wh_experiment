@@ -10,57 +10,78 @@
 #include <iostream>
 using namespace std;
 
+int main(int argc, char* argv[]) {
+    
+    unsigned int m = 1;
+    unsigned int K = 3;
 
+    int tasksets_count = 100;  // number of task sets
+    int tasks_per_set = 5;     // number of tasks per set 
 
-int main (int argc,char *argv[])
-{
-  // Weakly-hard parameters: to be modified for different tests
-  bool job_kill=false;
-  unsigned int m = 1;
-  unsigned int K = 4;
-  
-  // Task set parameters
-  int  n = 4;
-  string fname="example/taskset.dat";
+    double total_time = 0.0;   // total time for running
+    int total_unschedulable_tasks = 0; // non-schedulable tasks
+    int total_satisfies_mk = 0; // tasks meet (m,k)
 
-  vector<Task> tasks=read_a_taskset(fname, n);
+    for (int set_idx = 1; set_idx <= tasksets_count; set_idx++) {
+        
+        std::cout << "************************************\n";
+        vector<Task> tasks;
+        string fname = "5_tasks/taskset_dat/" + to_string(set_idx) + ".dat";
+        std::cout << "Reading " << fname << endl;
+        tasks = read_a_taskset(fname, tasks_per_set);
 
-  for ( int x = 1; x <= n; x++) {
-    vector<Task> hps;
-    for ( int y = 1; y < x; y++) 
-      hps.push_back( tasks[y-1]);
-    compute_wcrt(tasks[x-1], hps);
-    compute_bp(tasks[x-1], hps);
-    compute_bcrt(tasks[x-1], hps);
+        for (int x = 1; x <= tasks_per_set; x++) {
+            
+            vector<Task> hps;  // tasks with higher priority
+            for (int y = 1; y < x; y++)
+                hps.push_back(tasks[y - 1]);
+            // compute WCRT、BP、BCRT
+            compute_wcrt(tasks[x - 1], hps);
+            compute_bp(tasks[x - 1], hps);
+            compute_bcrt(tasks[x - 1], hps);
 
-    tasks[x-1].print();
-    if(tasks[x-1].wcrt<=tasks[x-1].dline) continue;
-	
-	// else: start weakly-hard analysis
-    std::cout << "+++++++++++++++++++++++++++++++\n";
-    std::cout << "Task " << tasks[x-1].get_id() << " is un-schedulable\n";
+            
+            if (tasks[x - 1].wcrt <= tasks[x - 1].dline)
+                continue;  // schedulable task
+            std::cout << "------------------------------------\n";
+            tasks[x-1].print();
+            // std::cout << "Task " << tasks[x - 1].get_id() << " is un-schedulable\n";
+            std::cout << "Task " << x << " is un-schedulable\n";
 
-    statWA swa;
+            // non-schedulable task, weakly hard analysis
+	        std::cout << "Running weakly-hard analysis: " << "m=" << m << ", K=" << K << " ... " << std::endl;
+            total_unschedulable_tasks++;  
+            statWA swa;
+            try{
+                swa = wanalysis(tasks[x - 1], hps, m, K);
+            }catch(...){
+            }
+              
+            std::cout << "the number of missed deadline is " << swa.m << "\n";
+	        std::cout << "Time = " << swa.time << " sec " << std::endl;
+	        std::cout << "Constrain satisfied? " << swa.satisfies_mk << "\n";
+	        std::cout << std::endl << std::endl;
 
-	std::cout << "Running weakly-hard analysis: " << ", K=" << K << " ... " << std::endl;
-	std::cout << "job_kill: " << job_kill << endl;
-	
-	if (job_kill) {
-		swa = wanalysis_kill(tasks[x - 1], hps, K);
-		// swa = wanalysis_kill_fast(tasks[x - 1], hps, K); // version without constraints of refined analysis
-	}
-	else { // job_continue
-		swa = wanalysis(tasks[x - 1], hps, m, K);
-		// swa = wanalysis_fast(tasks[x - 1], hps, m, K); // version without constraints of refined analysis
-	}
-	
-	std::cout << "*************** Weakly Hard analysis completed with parameters " << swa.m << "," << K << "******\n";
-	std::cout << "Time = " << swa.time << " sec " << std::endl;
-	std::cout << "+++++++++++++++++++++++++++++++\n";
-	std::cout << std::endl << std::endl;
-	
-  }
+            total_time += swa.time;
+            // std::cout << "total_time is " << total_time << "\n";
+            
+            if (swa.satisfies_mk) {
+                total_satisfies_mk++;
+            }
+            // std::cout << "total_satisfies_mk is " << total_satisfies_mk << "\n";
+        }
+    }
 
-  system("pause");
-  return 0;
+    // 计算运行时间的平均值和满足m/K的比例
+    double average_time = total_time / (tasksets_count * tasks_per_set);
+    double mk_satisfaction_ratio = (total_unschedulable_tasks == 0) ? 0.0 : (double)total_satisfies_mk / total_unschedulable_tasks;
+
+    // 输出结果
+    std::cout << "total_satisfies_mk is " << total_satisfies_mk << "\n";
+    std::cout << "total_unschedulable_tasks is " << total_unschedulable_tasks << "\n";
+    cout << "Average execution time: " << average_time << " sec" << endl;
+    cout << "Ratio of unschedulable tasks that satisfy m/K: " << mk_satisfaction_ratio * 100 << "%" << endl;
+
+    system("pause");
+    return 0;
 }
