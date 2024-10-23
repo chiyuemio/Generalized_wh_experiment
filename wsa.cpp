@@ -50,6 +50,13 @@ int main(int argc, char* argv[]) {
 
             // non-schedulable task, weakly hard analysis
 	        std::cout << "Running weakly-hard analysis: " << "m=" << m << ", K=" << K << " ... " << std::endl;
+
+            if (tasks[x - 1].wcrt > 10000){
+                std::cout << "taskset" << to_string(set_idx) << " task" << x << ": wcrt is not convergent..." << endl;
+                std::cout << endl;
+                continue;
+            }
+
             total_unschedulable_tasks++;  
             statWA swa;
             try{
@@ -63,20 +70,16 @@ int main(int argc, char* argv[]) {
 	        std::cout << std::endl << std::endl;
 
             total_time += swa.time;
-            // std::cout << "total_time is " << total_time << "\n";
             
             if (swa.satisfies_mk) {
                 total_satisfies_mk++;
             }
-            // std::cout << "total_satisfies_mk is " << total_satisfies_mk << "\n";
         }
     }
 
-    // 计算运行时间的平均值和满足m/K的比例
     double average_time = total_time / (tasksets_count * tasks_per_set);
     double mk_satisfaction_ratio = (total_unschedulable_tasks == 0) ? 0.0 : (double)total_satisfies_mk / total_unschedulable_tasks;
 
-    // 输出结果
     std::cout << "total_satisfies_mk is " << total_satisfies_mk << "\n";
     std::cout << "total_unschedulable_tasks is " << total_unschedulable_tasks << "\n";
     cout << "Average execution time: " << average_time << " sec" << endl;

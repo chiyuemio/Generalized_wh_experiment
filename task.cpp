@@ -85,6 +85,8 @@ void compute_wcrt(Task& tk, const vector<Task>& hps) {
 		// WCRT as worst response time for each iteration
 		if (rt >= wcrt)
 			wcrt = rt;
+		if (wcrt > 10000)
+			break;
 		k++;
 
 	} while (rt >= p);
