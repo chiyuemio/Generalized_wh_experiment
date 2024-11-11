@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
     unsigned int K = 3;
 
     int tasksets_count = 100;  // number of task sets
-    int tasks_per_set = 5;     // number of tasks per set 
-    string u = "0.8";
+    int tasks_per_set = 6;     // number of tasks per set 
+    string u = "0.98";
 
     double total_time = 0.0;   // total time for running
     int total_unschedulable_tasks = 0; // non-schedulable tasks
