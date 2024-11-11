@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
 
     int tasksets_count = 100;  // number of task sets
     int tasks_per_set = 5;     // number of tasks per set 
+    string u = "0.8";
 
     double total_time = 0.0;   // total time for running
     int total_unschedulable_tasks = 0; // non-schedulable tasks
@@ -26,7 +27,7 @@ int main(int argc, char* argv[]) {
         
         std::cout << "************************************\n";
         vector<Task> tasks;
-        string fname = "5_tasks/taskset_dat/" + to_string(set_idx) + ".dat";
+        string fname = "taskset_phase2/n-" + to_string(tasks_per_set) + "_u-" + u + "/" + to_string(set_idx) + ".dat";
         std::cout << "Reading " << fname << endl;
         tasks = read_a_taskset(fname, tasks_per_set);
 
