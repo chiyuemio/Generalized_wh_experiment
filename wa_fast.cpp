@@ -439,7 +439,7 @@ statWA wanalysis_fast(const Task& ti, const std::vector<Task>& hps, const int m,
 		//// Extracting the model
 		IloCplex cplex(model);
 
-		const int timeLimit = 60;
+		const int timeLimit = 60 * 60; 
 		cplex.setParam(IloCplex::TiLim, timeLimit);
 
 		cplex.setOut(env.getNullStream());

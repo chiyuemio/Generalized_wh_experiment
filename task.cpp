@@ -67,7 +67,10 @@ void compute_wcrt(Task& tk, const vector<Task>& hps) {
 	double wcrt = c;
 	double ajrt = c;
 	double ajrt0 = c;
+	double TOL = 0.2;
 	int k = 1;
+
+	bool finished = false;
 
 	do {
 		do {
@@ -82,6 +85,9 @@ void compute_wcrt(Task& tk, const vector<Task>& hps) {
 
 		rt = ajrt - (k - 1)*p;
 
+		if (fabs(rt - wcrt) < TOL)
+			finished = true;
+		
 		// WCRT as worst response time for each iteration
 		if (rt >= wcrt)
 			wcrt = rt;
@@ -89,7 +95,7 @@ void compute_wcrt(Task& tk, const vector<Task>& hps) {
 			break;
 		k++;
 
-	} while (rt >= p);
+	} while (!finished);
 
 	tk.set_wcrt(wcrt);
 }
